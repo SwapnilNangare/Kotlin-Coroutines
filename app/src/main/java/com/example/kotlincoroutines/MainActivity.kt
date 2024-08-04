@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity() {
@@ -22,28 +23,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         clickButton = findViewById(R.id.btn)
-        Log.d(TAG, "Button CLick ${Thread.currentThread().name}")
 
         clickButton.setOnClickListener {
 
             //   Log.d(TAG, "Button CLick ${Thread.currentThread().name}")
         }
 
-
-    }
-
-    private fun executeLogRunningTask() {
-        for (i in 0..10000000000L) {
-            Log.d(TAG, "Button CLick ${Thread.currentThread().name}")
+        CoroutineScope(Dispatchers.Main).launch {
+            task1()
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            task2()
         }
 
+
     }
 
-    fun doAction(view: View) {
 
-//        thread(start = true) {
-//            executeLogRunningTask()
-//        }
+    fun doAction(view: View) {
 
         CoroutineScope(Dispatchers.IO).launch {
             Log.d(TAG, "doAction 1: ${Thread.currentThread().name}")
@@ -54,6 +51,21 @@ class MainActivity : AppCompatActivity() {
         MainScope().launch(Dispatchers.Default) {
             Log.d(TAG, "doAction 3: ${Thread.currentThread().name}")
         }
+
+    }
+
+
+    suspend fun task1() {
+        Log.d(TAG, "STARTING TASK 1")
+        yield()
+        Log.d(TAG, "ENDING  TASK 1")
+
+    }
+
+    suspend fun task2() {
+        Log.d(TAG, "STARTING TASK 2")
+        yield()
+        Log.d(TAG, "ENDING  TASK 2")
 
     }
 
